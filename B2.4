@@ -1,0 +1,119 @@
+using System.Collections;
+using System.Diagnostics;
+
+namespace ConsoleApp6
+{
+    internal class Program
+    {
+        public class Timing
+        {
+            TimeSpan startingTime;
+            TimeSpan duration;
+            public Timing()
+            {
+                startingTime = new TimeSpan(0);
+                duration = new TimeSpan(0);
+            }
+            public void StopTime()
+            {
+                duration =
+                Process.GetCurrentProcess().Threads[0].
+                UserProcessorTime.
+                Subtract(startingTime);
+            }
+            public void startTime()
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                startingTime =
+                Process.GetCurrentProcess().Threads[0].
+                UserProcessorTime;
+            }
+            public TimeSpan Result()
+            {
+                return duration;
+            }
+        }
+        public static ArrayList GenerateScores(int scoreCount)
+        {
+            ArrayList scores = new ArrayList();
+            Random rand = new Random();
+            for (int i = 0; i < scoreCount; i++)
+            {
+                scores.Add(rand.Next(1, 10)); 
+            }
+            return scores;
+        }
+        public static double SumList(ArrayList list)
+        {
+            double sum = 0;
+            foreach (object obj in list)
+            {
+                sum += Convert.ToDouble(obj);
+            }
+            return sum;
+        }
+
+        public static double AverageList(ArrayList list)
+        {
+            double sum = SumList(list);
+            return sum / list.Count;
+        }
+
+        public static double MaxList(ArrayList list)
+        {
+            double max = double.MinValue;
+            foreach (object obj in list)
+            {
+                double num = Convert.ToDouble(obj);
+                if (num > max)
+                {
+                    max = num;
+                }
+            }
+            return max;
+        }
+
+        public static double MinList(ArrayList list)
+        {
+            double min = double.MaxValue;
+            foreach (object obj in list)
+            {
+                double num = Convert.ToDouble(obj);
+                if (num < min)
+                {
+                    min = num;
+                }
+            }
+            return min;
+        }
+
+        static void Main(string[] args)
+        {
+            Timing timing = new Timing();
+            timing.startTime();
+            Console.WriteLine("Diem la: ");
+            ArrayList scores = GenerateScores(10);
+
+            foreach (object score in scores)
+            {
+                Console.Write(score + ", ");
+            }
+            Console.WriteLine();
+
+            double average = AverageList(scores);
+            double max = MaxList(scores);
+            double min = MinList(scores);
+
+            Console.WriteLine("Average Score: " + average);
+            Console.WriteLine("Highest Score: " + max);
+            Console.WriteLine("Lowest Score: " + min);
+
+            timing.StopTime();
+            Console.WriteLine("Execution Time: " + timing.Result().TotalMilliseconds + " ms");
+
+            }
+
+        }
+    
+}
