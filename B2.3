@@ -1,0 +1,112 @@
+using System.Diagnostics;
+
+namespace ConsoleApp6
+{
+    internal class Program
+    {
+        public class Timing
+        {
+            TimeSpan startingTime;
+            TimeSpan duration;
+            public Timing()
+            {
+                startingTime = new TimeSpan(0);
+                duration = new TimeSpan(0);
+            }
+            public void StopTime()
+            {
+                duration =
+                Process.GetCurrentProcess().Threads[0].
+                UserProcessorTime.
+                Subtract(startingTime);
+            }
+            public void startTime()
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                startingTime =
+                Process.GetCurrentProcess().Threads[0].
+                UserProcessorTime;
+            }
+            public TimeSpan Result()
+            {
+                return duration;
+            }
+        }
+       public static List <double> GenerateScores(int scoreCount)
+        {
+            List<double> scores = new List<double>();
+            Random rand = new Random ();
+            for(int i =0; i < scoreCount; i++)
+            {
+                scores.Add(rand.Next(1, 10));
+            }
+            return scores;
+        }
+        public static double SumList(List<double> list)
+        {
+            double sum = 0;
+            foreach(double num in list)
+            {
+                sum += num;
+            }
+            return sum;
+        }
+        public static double AverageList(List<double> list)
+        {
+            double sum = SumList(list);
+            return sum / list.Count;
+        }
+        public static double MaxList(List<double> list)
+        {
+            double max = double.MinValue;
+            foreach (double num in list)
+            {
+                if (num > max)
+                {
+                    max = num;
+                }
+            }
+            return max;
+        }
+        public static double MinList(List<double> list)
+        {
+            double min = double.MaxValue;
+            foreach (double num in list)
+            {
+                if (num < min)
+                {
+                    min = num;
+                }
+            }
+            return min;
+        }
+        static void Main(string[] args)
+        {
+            Timing timing = new Timing();
+            timing.startTime();
+            Console.WriteLine("Diem la: ");
+            List<double> scores = GenerateScores(10);
+            
+            foreach (double score in scores)
+            {
+                Console.Write(score + ", ");
+            }
+            Console.WriteLine();
+
+            double average = AverageList(scores);
+            double max = MaxList(scores);
+            double min = MinList(scores);
+
+            Console.WriteLine("Average Score: " + average);
+            Console.WriteLine("Highest Score: " + max);
+            Console.WriteLine("Lowest Score: " + min);
+
+            timing.StopTime();
+            Console.WriteLine("Execution Time: " + timing.Result().TotalMilliseconds + " ms");
+
+            }
+
+        }
+    
+}
