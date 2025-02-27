@@ -1,0 +1,114 @@
+using System.Diagnostics;
+
+namespace ConsoleApp6
+{
+    internal class Program
+    {
+        public class Timing
+        {
+            TimeSpan startingTime;
+            TimeSpan duration;
+            public Timing()
+            {
+                startingTime = new TimeSpan(0);
+                duration = new TimeSpan(0);
+            }
+            public void StopTime()
+            {
+                duration =
+                Process.GetCurrentProcess().Threads[0].
+                UserProcessorTime.
+                Subtract(startingTime);
+            }
+            public void startTime()
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                startingTime =
+                Process.GetCurrentProcess().Threads[0].
+                UserProcessorTime;
+            }
+            public TimeSpan Result()
+            {
+                return duration;
+            }
+        }
+        public static Array GenericGenArray<T>(int len)
+        {
+            Array arr = Array.CreateInstance(typeof(T), new int[] { len }, new int[] { 0 });
+            Random rand = new Random();
+            for (int i = arr.GetLowerBound(0); i <= arr.GetUpperBound(0); i++)
+            {
+                arr.SetValue(rand.Next(1, 10), i);
+            }
+            foreach (var item in arr)
+            {
+                Console.Write(item + ", ");
+            }
+            Console.WriteLine();
+            return arr;
+        }
+        public static double SumArray(Array arr)
+        {
+            double sum = 0;
+            foreach (double num in arr)
+            {
+                sum += num;
+            }
+            return sum;
+        }
+        public static double AverageArray(Array arr)
+        {
+
+            double sum = SumArray(arr);
+            return sum / arr.Length;
+        }
+        public static double MaxArray(Array arr)
+        {
+            double max = double.MinValue;
+            foreach(double num in arr)
+            {
+                if (num is double && num> max)
+                {
+                    max = num;
+                }
+            }
+            return max;
+        }
+        public static double MinArray(Array arr)
+        {
+            double min = double.MaxValue;
+            foreach (double num in arr)
+            {
+                if (num is double && num < min)
+                {
+                    min = num;
+                }
+            }
+            return min;
+        }
+        static void Main(string[] args)
+        {
+            Timing timing = new Timing();
+            timing.startTime();
+
+            Console.WriteLine("Diem la: ");
+            Array scores = GenericGenArray<double>(10);
+            Console.WriteLine();
+
+            double average = AverageArray(scores);
+            double max = MaxArray(scores);
+            double min = MinArray(scores);
+
+            Console.WriteLine("Average Score: " + average);
+            Console.WriteLine("Highest Score: " + max);
+            Console.WriteLine("Lowest Score: " + min);
+
+            timing.StopTime();
+            Console.WriteLine("Execution Time: " + timing.Result().TotalMilliseconds + " ms");
+
+        }
+        
+    }
+}
+
